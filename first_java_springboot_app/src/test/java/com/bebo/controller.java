@@ -8,6 +8,6 @@ public class controller{
     @GetMapping("/staffname")
     public String getstaffdata()
     {
-        return "staffname.html";
+        return "staffname";
     }
 }
