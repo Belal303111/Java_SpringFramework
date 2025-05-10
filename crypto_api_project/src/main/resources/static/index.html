@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CryptoAPI Interface</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 40px;
+            color: #333;
+        }
+
+        .container {
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>CryptoAPI - Encrypt, Decrypt & Hash</h2>
+
+        <label for="algorithm">Select Algorithm:</label>
+        <select id="algorithm">
+            <option value="AES">AES</option>
+            <option value="RSA">RSA</option>
+            <option value="SHA-256">SHA-256 (Hash only)</option>
+        </select>
+
+        <label for="key">Key (required for AES):</label>
+        <input type="text" id="key" placeholder="Enter encryption key (AES only)">
+
+        <label for="inputText">Text:</label>
+        <textarea id="inputText" rows="4" placeholder="Enter text to encrypt, decrypt or hash..."></textarea>
+
+        <button onclick="sendRequest('encrypt')">Encrypt</button>
+        <button onclick="sendRequest('decrypt')">Decrypt</button>
+        <button onclick="sendRequest('hash')">Hash</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function sendRequest(action) {
+            const algorithm = document.getElementById("algorithm").value;
+            const key = document.getElementById("key").value;
+            const inputText = document.getElementById("inputText").value;
+            const resultDiv = document.getElementById("result");
+
+            if (!inputText) {
+                resultDiv.innerText = "Please enter the text.";
+                return;
+            }
+
+            if (algorithm === "AES" && !key) {
+                resultDiv.innerText = "Key is required for AES algorithm.";
+                return;
+            }
+
+            if ((algorithm === "SHA-256") && (action !== "hash")) {
+                resultDiv.innerText = "SHA-256 supports only hashing.";
+                return;
+            }
+
+            const url = `/api/${action}`;
+            const payload = {
+                algorithm: algorithm,
+                key: key,
+                inputText: inputText
+            };
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.text())
+            .then(data => {
+                resultDiv.innerText = data;
+            })
+            .catch(err => {
+                resultDiv.innerText = "Error: " + err.message;
+            });
+        }
+    </script>
+</body>
+</html>
